@@ -1,0 +1,2378 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Max-Heap Interactivo</title>
+
+<style>
+:root{
+  --bg:#0f172a; --panel:#1e293b; --panel2:#243449; --line:#334155;
+  --txt:#e2e8f0; --muted:#94a3b8; --accent:#38bdf8; --good:#34d399;
+  --bad:#f87171; --warn:#fbbf24; --node:#cbd5e1; --node-txt:#0f172a;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+
+body{
+  font-family:'Segoe UI',system-ui,sans-serif;
+  background:var(--bg);
+  color:var(--txt);
+  min-height:100vh;
+}
+
+header{
+  text-align:center;
+  padding:28px 16px 0;
+}
+
+header h1{
+  font-size:1.7rem;
+  letter-spacing:.5px;
+}
+
+.subtitle{
+  color:var(--muted);
+  margin-top:6px;
+  font-size:.95rem;
+}
+
+nav{
+  display:flex;
+  justify-content:center;
+  gap:8px;
+  margin:20px auto 0;
+  background:var(--panel);
+  width:max-content;
+  padding:6px;
+  border-radius:12px;
+  border:1px solid var(--line);
+}
+
+nav button{
+  background:transparent;
+  border:none;
+  color:var(--muted);
+  font-size:.95rem;
+  padding:9px 18px;
+  border-radius:8px;
+  cursor:pointer;
+  font-weight:600;
+  transition:.2s;
+}
+
+nav button:hover{color:var(--txt);}
+nav button.active{
+  background:var(--accent);
+  color:#0f172a;
+}
+
+main{
+  max-width:1000px;
+  margin:26px auto 60px;
+  padding:0 16px;
+}
+
+section.tab{display:none;}
+section.tab.visible{
+  display:block;
+  animation:fadeIn .25s ease;
+}
+
+@keyframes fadeIn{
+  from{opacity:0;transform:translateY(6px);}
+  to{opacity:1;transform:none;}
+}
+
+.panel{
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:22px;
+  margin-bottom:18px;
+}
+
+.panel h2{
+  font-size:1.15rem;
+  margin-bottom:12px;
+  color:var(--accent);
+}
+
+.panel h3{
+  color:var(--txt);
+  margin:16px 0 8px;
+}
+
+.panel p{
+  color:var(--txt);
+  line-height:1.65;
+  margin-bottom:10px;
+}
+
+.muted{
+  color:var(--muted);
+  font-size:.9rem;
+}
+
+.cards{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+  gap:16px;
+}
+
+.diagram-wrap{text-align:center;}
+
+.diagram-wrap svg{
+  max-width:100%;
+  height:auto;
+}
+
+.tag-ok{
+  color:var(--good);
+  font-weight:700;
+}
+
+.tag-bad{
+  color:var(--bad);
+  font-weight:700;
+}
+
+.analogy{
+  border-left:4px solid var(--accent);
+  background:#172337;
+}
+
+.analogy-icon{
+  font-size:2.3rem;
+  margin-bottom:8px;
+}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+  font-size:.92rem;
+}
+
+th,td{
+  padding:10px;
+  text-align:left;
+  border-bottom:1px solid var(--line);
+}
+
+th{
+  color:var(--accent);
+  font-weight:600;
+}
+
+code{
+  background:#0b1220;
+  border:1px solid var(--line);
+  border-radius:6px;
+  padding:2px 7px;
+  font-size:.88rem;
+  color:#7dd3fc;
+}
+
+pre{
+  background:#0b1220;
+  border:1px solid var(--line);
+  border-radius:10px;
+  padding:18px;
+  overflow-x:auto;
+  line-height:1.55;
+  color:#cbd5e1;
+  font-size:.86rem;
+}
+
+pre code{
+  border:none;
+  padding:0;
+  background:transparent;
+  color:#cbd5e1;
+}
+
+ul.nice{
+  list-style:none;
+  margin-top:6px;
+}
+
+ul.nice li{
+  padding:6px 0 6px 22px;
+  position:relative;
+  line-height:1.5;
+}
+
+ul.nice li::before{
+  content:"";
+  position:absolute;
+  left:2px;
+  top:13px;
+  width:8px;
+  height:8px;
+  border-radius:50%;
+  background:var(--accent);
+}
+
+.tip{
+  padding:12px 15px;
+  background:#172337;
+  border-radius:9px;
+  border:1px solid var(--line);
+  margin-top:12px;
+}
+
+.app-card{
+  background:#172337;
+  border:1px solid var(--line);
+  border-radius:10px;
+  padding:15px;
+}
+
+.app-card h3{
+  margin-top:0;
+  color:var(--accent);
+}
+
+.lab-controls{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  align-items:center;
+}
+
+.lab-controls input{
+  background:#0b1220;
+  border:1px solid var(--line);
+  color:var(--txt);
+  padding:10px 14px;
+  border-radius:8px;
+  font-size:1rem;
+  width:110px;
+}
+
+.lab-controls input:focus{
+  outline:2px solid var(--accent);
+}
+
+.btn{
+  background:var(--accent);
+  color:#0f172a;
+  border:none;
+  font-weight:700;
+  padding:10px 20px;
+  border-radius:8px;
+  cursor:pointer;
+  font-size:.95rem;
+  transition:.15s;
+}
+
+.btn:hover:not(:disabled){
+  filter:brightness(1.12);
+}
+
+.btn:disabled{
+  opacity:.45;
+  cursor:not-allowed;
+}
+
+.btn.ghost{
+  background:transparent;
+  color:var(--txt);
+  border:1px solid var(--line);
+}
+
+.btn.danger{
+  background:var(--bad);
+}
+
+.tree-box{
+  position:relative;
+  height:370px;
+  margin-top:18px;
+  overflow:hidden;
+  background:#0b1220;
+  border:1px solid var(--line);
+  border-radius:12px;
+}
+
+.tree-box svg.edges{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+}
+
+.hnode{
+  position:absolute;
+  transform:translate(-50%,-50%);
+  width:46px;
+  height:46px;
+  border-radius:50%;
+  background:linear-gradient(145deg,#e2e8f0,#94a3b8);
+  color:var(--node-txt);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight:800;
+  font-size:1rem;
+  z-index:2;
+  transition:left .45s ease,top .45s ease,box-shadow .25s;
+  border:3px solid #64748b;
+  user-select:none;
+}
+
+.hnode.cur{
+  border-color:var(--warn);
+  box-shadow:0 0 14px rgba(251,191,36,.55);
+}
+
+.hnode.par{
+  border-color:var(--accent);
+  box-shadow:0 0 14px rgba(56,189,248,.55);
+}
+
+.hnode.ok{
+  border-color:var(--good);
+  box-shadow:0 0 14px rgba(52,211,153,.55);
+}
+
+.hnode.removing{
+  border-color:var(--bad);
+  box-shadow:0 0 18px rgba(248,113,113,.7);
+  transform:translate(-50%,-50%) scale(1.12);
+}
+
+.log{
+  margin-top:14px;
+  background:#0b1220;
+  border:1px solid var(--line);
+  border-radius:10px;
+  min-height:86px;
+  max-height:150px;
+  overflow-y:auto;
+  padding:10px 14px;
+  font-size:.9rem;
+}
+
+.log p{
+  margin-bottom:6px;
+  line-height:1.5;
+}
+
+.log .cmp{color:var(--warn);}
+.log .swp{color:var(--bad);}
+.log .inf{color:var(--muted);}
+.log .done{
+  color:var(--good);
+  font-weight:600;
+}
+
+.strip-label{
+  margin-top:16px;
+  color:var(--muted);
+  font-size:.85rem;
+}
+
+.strip{
+  display:flex;
+  gap:6px;
+  flex-wrap:wrap;
+  margin-top:8px;
+}
+
+.cell{
+  background:#0b1220;
+  border:1px solid var(--line);
+  border-radius:8px;
+  min-width:46px;
+  text-align:center;
+  padding:6px 4px 4px;
+}
+
+.cell .val{
+  font-weight:700;
+  display:block;
+}
+
+.cell .idx{
+  font-size:.72rem;
+  color:var(--accent);
+}
+
+.game-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:10px;
+}
+
+.stat{
+  display:flex;
+  gap:18px;
+  align-items:center;
+}
+
+.stat .big{
+  font-size:1.25rem;
+  font-weight:800;
+  color:var(--accent);
+}
+
+.pips{
+  display:flex;
+  gap:6px;
+}
+
+.pip{
+  width:14px;
+  height:14px;
+  border-radius:50%;
+  background:var(--good);
+}
+
+.pip.lost{background:#334155;}
+
+.gtree{
+  width:100%;
+  max-width:640px;
+  margin:14px auto 0;
+  display:block;
+}
+
+.gnode{cursor:pointer;}
+
+.gnode circle{
+  fill:var(--node);
+  stroke:#64748b;
+  stroke-width:3;
+  transition:.2s;
+}
+
+.gnode:hover circle{stroke:var(--accent);}
+
+.gnode text{
+  fill:var(--node-txt);
+  font-weight:800;
+  font-size:17px;
+  pointer-events:none;
+}
+
+.gnode.wrong circle{
+  fill:var(--bad);
+  stroke:var(--bad);
+}
+
+.gnode.found circle{
+  fill:var(--good);
+  stroke:var(--good);
+}
+
+.gnode.dim{
+  opacity:.35;
+  pointer-events:none;
+}
+
+.gedge{
+  stroke:var(--line);
+  stroke-width:3;
+}
+
+.gmsg{
+  margin-top:16px;
+  border-radius:10px;
+  padding:12px 16px;
+  font-size:.95rem;
+  line-height:1.5;
+  min-height:48px;
+  background:#0b1220;
+  border:1px solid var(--line);
+}
+
+.gmsg.good{
+  border-color:var(--good);
+  color:var(--good);
+}
+
+.gmsg.bad{
+  border-color:var(--bad);
+  color:var(--bad);
+}
+
+.game-actions{
+  margin-top:14px;
+  display:flex;
+  gap:10px;
+}
+
+.hidden{
+  display:none !important;
+}
+
+footer{
+  text-align:center;
+  color:var(--muted);
+  font-size:.82rem;
+  padding:20px;
+}
+
+@media(max-width:600px){
+  .hnode{
+    width:38px;
+    height:38px;
+    font-size:.85rem;
+  }
+
+  nav button{
+    padding:8px 12px;
+    font-size:.85rem;
+  }
+
+  .lab-controls{
+    align-items:stretch;
+  }
+
+  .lab-controls input{
+    width:100%;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <h1>Montículo Binario (Max-Heap)</h1>
+  <p class="subtitle">
+    Aprende la estructura de datos con teoría, analogía, laboratorio y mini-juego
+  </p>
+
+  <nav>
+    <button data-tab="teoria" class="active">Teoría</button>
+    <button data-tab="laboratorio">Laboratorio</button>
+    <button data-tab="juego">Mini-juego</button>
+  </nav>
+</header>
+
+<main>
+
+<!-- =========================================================
+     TEORÍA
+========================================================= -->
+
+<section id="tab-teoria" class="tab visible">
+
+  <div class="panel">
+    <h2>¿Qué es un Max-Heap?</h2>
+
+    <p>
+      Un <strong>heap</strong> o <strong>montículo</strong> es una estructura de datos
+      basada en un árbol binario completo. Esto significa que los niveles se llenan
+      de izquierda a derecha y no existen huecos antes de los últimos elementos.
+    </p>
+
+    <p>
+      Existen dos variantes principales: <strong>Max-Heap</strong> y
+      <strong>Min-Heap</strong>. En un Max-Heap, cada padre debe ser
+      <strong>mayor o igual que sus hijos</strong>.
+    </p>
+
+    <p style="text-align:center;font-size:1.15rem;">
+      <span class="tag-ok">
+        Padre ≥ hijo izquierdo y Padre ≥ hijo derecho
+      </span>
+    </p>
+
+    <div class="tip">
+      <strong>Importante:</strong> el Max-Heap no ordena todos los elementos.
+      Solo garantiza la relación entre cada padre y sus hijos. Por eso dos hermanos
+      pueden estar en cualquier orden.
+    </div>
+  </div>
+
+  <!-- ANALOGÍA -->
+  <div class="panel analogy">
+    <div class="analogy-icon">🏆</div>
+    <h2>Analogía: un torneo donde el ganador sube</h2>
+
+    <p>
+      Imagina un torneo de eliminación en el que cada participante se enfrenta
+      indirectamente con otros jugadores. En cada grupo, el participante con
+      mayor puntuación queda por encima de sus competidores.
+    </p>
+
+    <p>
+      El jugador que termina en la parte superior representa la
+      <strong>raíz del Max-Heap</strong> y siempre contiene el valor máximo.
+      Cada jugador debajo de él representa un hijo.
+    </p>
+
+    <p>
+      Si aparece un jugador con una puntuación mayor que la de su padre,
+      se intercambian sus posiciones. El jugador más fuerte va subiendo hasta
+      encontrar una posición donde vuelva a cumplirse la regla.
+    </p>
+
+    <p>
+      Esto es exactamente lo que ocurre durante una operación de
+      <strong>inserción</strong>: el nuevo elemento entra al final y
+      <strong>flota hacia arriba</strong> mediante intercambios.
+    </p>
+
+    <p>
+      Cuando eliminamos al máximo, el último elemento ocupa temporalmente
+      la raíz y después <strong>se hunde</strong> hasta encontrar una posición válida.
+    </p>
+  </div>
+
+  <div class="cards">
+
+    <div class="panel diagram-wrap">
+      <h2>Cumple la regla</h2>
+
+      <svg viewBox="0 0 260 190" width="260">
+        <g stroke="#334155" stroke-width="3">
+          <line x1="130" y1="35" x2="70" y2="105"/>
+          <line x1="130" y1="35" x2="190" y2="105"/>
+          <line x1="70" y1="105" x2="40" y2="165"/>
+          <line x1="70" y1="105" x2="100" y2="165"/>
+          <line x1="190" y1="105" x2="160" y2="165"/>
+          <line x1="190" y1="105" x2="220" y2="165"/>
+        </g>
+
+        <g font-weight="800" font-size="16" text-anchor="middle">
+          <circle cx="130" cy="30" r="22" fill="#34d399"/>
+          <text x="130" y="36">90</text>
+
+          <circle cx="70" cy="100" r="22" fill="#cbd5e1"/>
+          <text x="70" y="106" fill="#0f172a">80</text>
+
+          <circle cx="190" cy="100" r="22" fill="#cbd5e1"/>
+          <text x="190" y="106" fill="#0f172a">60</text>
+
+          <circle cx="40" cy="160" r="22" fill="#cbd5e1"/>
+          <text x="40" y="166" fill="#0f172a">70</text>
+
+          <circle cx="100" cy="160" r="22" fill="#cbd5e1"/>
+          <text x="100" y="166" fill="#0f172a">50</text>
+
+          <circle cx="160" cy="160" r="22" fill="#cbd5e1"/>
+          <text x="160" y="166" fill="#0f172a">40</text>
+
+          <circle cx="220" cy="160" r="22" fill="#cbd5e1"/>
+          <text x="220" y="166" fill="#0f172a">30</text>
+        </g>
+      </svg>
+
+      <p class="tag-ok">
+        Válido: ningún hijo supera a su padre.
+      </p>
+    </div>
+
+    <div class="panel diagram-wrap">
+      <h2>Rompe la regla</h2>
+
+      <svg viewBox="0 0 260 190" width="260">
+        <line x1="130" y1="35" x2="70" y2="105"
+              stroke="#f87171" stroke-width="4"/>
+
+        <line x1="130" y1="35" x2="190" y2="105"
+              stroke="#334155" stroke-width="3"/>
+
+        <g font-weight="800" font-size="16" text-anchor="middle">
+          <circle cx="130" cy="30" r="22" fill="#f87171"/>
+          <text x="130" y="36">50</text>
+
+          <circle cx="70" cy="100" r="22" fill="#fbbf24"/>
+          <text x="70" y="106" fill="#0f172a">80</text>
+
+          <circle cx="190" cy="100" r="22" fill="#cbd5e1"/>
+          <text x="190" y="106" fill="#0f172a">60</text>
+        </g>
+
+        <text x="98" y="62"
+              fill="#f87171"
+              font-size="13"
+              font-weight="700">
+          ¡80 &gt; 50!
+        </text>
+      </svg>
+
+      <p class="tag-bad">
+        Inválido: el hijo 80 supera a su padre 50.
+      </p>
+    </div>
+
+  </div>
+
+  <!-- REPRESENTACIÓN -->
+  <div class="cards" style="margin-top:18px;">
+
+    <div class="panel">
+      <h2>¿Cómo se almacena?</h2>
+
+      <p>
+        Gracias a que el árbol es completo, no necesitamos utilizar
+        referencias o punteros para cada hijo. Podemos guardar todos los
+        valores directamente dentro de un arreglo.
+      </p>
+
+      <p>Para un elemento situado en el índice <code>i</code>:</p>
+
+      <ul class="nice">
+        <li>Padre: <code>Math.floor((i - 1) / 2)</code></li>
+        <li>Hijo izquierdo: <code>2 * i + 1</code></li>
+        <li>Hijo derecho: <code>2 * i + 2</code></li>
+      </ul>
+
+      <div class="strip" style="margin-top:12px;">
+        <div class="cell">
+          <span class="val">90</span>
+          <span class="idx">0</span>
+        </div>
+
+        <div class="cell">
+          <span class="val">80</span>
+          <span class="idx">1</span>
+        </div>
+
+        <div class="cell">
+          <span class="val">60</span>
+          <span class="idx">2</span>
+        </div>
+
+        <div class="cell">
+          <span class="val">70</span>
+          <span class="idx">3</span>
+        </div>
+
+        <div class="cell">
+          <span class="val">50</span>
+          <span class="idx">4</span>
+        </div>
+
+        <div class="cell">
+          <span class="val">40</span>
+          <span class="idx">5</span>
+        </div>
+
+        <div class="cell">
+          <span class="val">30</span>
+          <span class="idx">6</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>Operaciones principales</h2>
+
+      <ul class="nice">
+        <li>
+          <strong>Insertar:</strong> se coloca el elemento al final y
+          después se hace <em>sift-up</em>.
+        </li>
+
+        <li>
+          <strong>Extraer máximo:</strong> se elimina la raíz y el último
+          elemento se mueve hacia arriba para después hacer <em>sift-down</em>.
+        </li>
+
+        <li>
+          <strong>Consultar máximo:</strong> basta con leer la raíz.
+        </li>
+      </ul>
+    </div>
+
+  </div>
+
+  <!-- EFICIENCIA -->
+  <div class="panel">
+    <h2>Análisis de rendimiento — Big O</h2>
+
+    <p>
+      La altura de un heap binario es logarítmica respecto al número de
+      elementos. Por eso las operaciones que recorren el árbol de arriba
+      hacia abajo o de abajo hacia arriba suelen costar <strong>O(log n)</strong>.
+    </p>
+
+    <table>
+      <tr>
+        <th>Operación</th>
+        <th>Complejidad</th>
+        <th>¿Por qué?</th>
+      </tr>
+
+      <tr>
+        <td>Consultar máximo</td>
+        <td><strong>O(1)</strong></td>
+        <td>El máximo siempre está en la raíz.</td>
+      </tr>
+
+      <tr>
+        <td>Insertar</td>
+        <td><strong>O(log n)</strong></td>
+        <td>El elemento puede subir como máximo una altura del árbol.</td>
+      </tr>
+
+      <tr>
+        <td>Eliminar máximo</td>
+        <td><strong>O(log n)</strong></td>
+        <td>El último elemento puede descender por varios niveles.</td>
+      </tr>
+
+      <tr>
+        <td>Buscar un valor arbitrario</td>
+        <td><strong>O(n)</strong></td>
+        <td>El heap no está completamente ordenado.</td>
+      </tr>
+
+      <tr>
+        <td>Construir heap desde un arreglo</td>
+        <td><strong>O(n)</strong></td>
+        <td>El algoritmo bottom-up puede construirlo linealmente.</td>
+      </tr>
+    </table>
+
+    <div class="tip">
+      <strong>¿Cuándo conviene?</strong>
+      Un Max-Heap es ideal cuando necesitamos consultar o eliminar
+      repetidamente el elemento de mayor prioridad.
+    </div>
+
+    <div class="tip">
+      <strong>¿Cuándo no conviene?</strong>
+      No es la mejor opción cuando necesitamos buscar rápidamente
+      cualquier elemento concreto. Para eso pueden ser mejores estructuras
+      como una tabla hash o un árbol de búsqueda balanceado.
+    </div>
+  </div>
+
+  <!-- APLICACIONES -->
+  <div class="panel">
+    <h2>Aplicaciones en el mundo real</h2>
+
+    <div class="cards">
+
+      <div class="app-card">
+        <h3>🚦 Colas de prioridad</h3>
+        <p>
+          Los sistemas pueden almacenar tareas según su prioridad.
+          El elemento con mayor prioridad se obtiene rápidamente mediante
+          la raíz del Max-Heap.
+        </p>
+      </div>
+
+      <div class="app-card">
+        <h3>🎮 Sistemas de videojuegos</h3>
+        <p>
+          Un juego puede utilizar heaps para administrar eventos,
+          enemigos o acciones que deben procesarse según una prioridad
+          determinada.
+        </p>
+      </div>
+
+      <div class="app-card">
+        <h3>📊 Heap Sort</h3>
+        <p>
+          El algoritmo Heap Sort utiliza un heap para ordenar elementos
+          y garantiza un tiempo de O(n log n) en su funcionamiento.
+        </p>
+      </div>
+
+      <div class="app-card">
+        <h3>🗺️ Algoritmos de grafos</h3>
+        <p>
+          Estructuras basadas en heaps se utilizan para administrar
+          prioridades en algoritmos como Dijkstra y Prim.
+        </p>
+      </div>
+
+      <div class="app-card">
+        <h3>💻 Sistemas operativos</h3>
+        <p>
+          Los conceptos de colas de prioridad y heaps pueden utilizarse
+          para organizar procesos o tareas según niveles de prioridad.
+        </p>
+      </div>
+
+      <div class="app-card">
+        <h3>🔎 Procesamiento de datos</h3>
+        <p>
+          Los heaps son útiles para obtener rápidamente los elementos
+          con valores más altos o mantener rankings dinámicos.
+        </p>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- CÓDIGO BASE -->
+  <div class="panel">
+    <h2>Código base de un Max-Heap en JavaScript</h2>
+
+    <p>
+      Esta es una implementación básica de las operaciones fundamentales:
+      insertar, consultar el máximo y extraer el máximo.
+    </p>
+
+<pre><code>class MaxHeap {
+  constructor() {
+    this.heap = [];
+  }
+
+  parent(i) {
+    return Math.floor((i - 1) / 2);
+  }
+
+  left(i) {
+    return 2 * i + 1;
+  }
+
+  right(i) {
+    return 2 * i + 2;
+  }
+
+  insert(value) {
+    this.heap.push(value);
+
+    let i = this.heap.length - 1;
+
+    // Sift-up
+    while (i > 0) {
+      const p = this.parent(i);
+
+      if (this.heap[p] >= this.heap[i]) {
+        break;
+      }
+
+      [this.heap[p], this.heap[i]] =
+        [this.heap[i], this.heap[p]];
+
+      i = p;
+    }
+  }
+
+  peek() {
+    return this.heap.length > 0
+      ? this.heap[0]
+      : null;
+  }
+
+  extractMax() {
+    if (this.heap.length === 0) {
+      return null;
+    }
+
+    if (this.heap.length === 1) {
+      return this.heap.pop();
+    }
+
+    const max = this.heap[0];
+
+    this.heap[0] = this.heap.pop();
+
+    // Sift-down
+    let i = 0;
+
+    while (true) {
+      const left = this.left(i);
+      const right = this.right(i);
+
+      let largest = i;
+
+      if (
+        left &lt; this.heap.length &&
+        this.heap[left] &gt; this.heap[largest]
+      ) {
+        largest = left;
+      }
+
+      if (
+        right &lt; this.heap.length &&
+        this.heap[right] &gt; this.heap[largest]
+      ) {
+        largest = right;
+      }
+
+      if (largest === i) {
+        break;
+      }
+
+      [this.heap[i], this.heap[largest]] =
+        [this.heap[largest], this.heap[i]];
+
+      i = largest;
+    }
+
+    return max;
+  }
+}</code></pre>
+
+  </div>
+
+</section>
+
+
+<!-- =========================================================
+     LABORATORIO
+========================================================= -->
+
+<section id="tab-laboratorio" class="tab">
+
+  <div class="panel">
+
+    <h2>Laboratorio: inserta y observa cómo flota</h2>
+
+    <p>
+      Escribe un número e insértalo. El valor entra como hoja en la primera
+      posición libre y luego <strong>flota hacia arriba</strong> mientras
+      sea mayor que su padre.
+    </p>
+
+    <p>
+      También puedes utilizar <strong>Extraer máximo</strong> para eliminar
+      visualmente la raíz y observar cómo el último elemento ocupa su lugar
+      y después se hunde hasta restaurar la propiedad del Max-Heap.
+    </p>
+
+    <div class="lab-controls" style="margin-top:14px;">
+
+      <input
+        type="number"
+        id="labInput"
+        placeholder="Ej: 75"
+        min="-999"
+        max="999"
+      >
+
+      <button class="btn" id="btnInsert">
+        Insertar
+      </button>
+
+      <button class="btn danger" id="btnExtract">
+        Extraer máximo
+      </button>
+
+      <button class="btn ghost" id="btnRandom">
+        Aleatorio
+      </button>
+
+      <button class="btn ghost" id="btnResetLab">
+        Reiniciar
+      </button>
+
+      <span class="muted" id="labCount">
+        0 / 15 nodos
+      </span>
+
+    </div>
+
+    <div class="tree-box" id="labTree"></div>
+
+    <div class="log" id="labLog"></div>
+
+    <p class="strip-label">
+      El mismo heap guardado en un arreglo:
+    </p>
+
+    <div class="strip" id="labStrip"></div>
+
+  </div>
+
+</section>
+
+
+<!-- =========================================================
+     JUEGO
+========================================================= -->
+
+<section id="tab-juego" class="tab">
+
+  <div class="panel">
+
+    <div class="game-head">
+
+      <div>
+        <h2>Caza al intruso</h2>
+
+        <p class="muted" style="margin-top:4px;">
+          Haz clic en el nodo que rompe la regla del Max-Heap
+          (un hijo mayor que su padre). Solo hay uno.
+        </p>
+      </div>
+
+      <div class="stat">
+
+        <div>
+          Puntos<br>
+          <span class="big" id="gameScore">0</span>
+        </div>
+
+        <div>
+          Vidas
+
+          <div class="pips" id="gameLives">
+            <span class="pip"></span>
+            <span class="pip"></span>
+            <span class="pip"></span>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <p class="muted" id="gameRound" style="margin-top:10px;"></p>
+
+    <svg
+      class="gtree"
+      id="gameTree"
+      viewBox="0 0 640 400">
+    </svg>
+
+    <div class="gmsg" id="gameMsg">
+      Recuerda la regla:
+      todo padre debe ser mayor o igual que sus hijos.
+    </div>
+
+    <div class="game-actions">
+
+      <button class="btn hidden" id="btnNextRound">
+        Siguiente nivel
+      </button>
+
+      <button class="btn ghost hidden" id="btnPlayAgain">
+        Jugar de nuevo
+      </button>
+
+    </div>
+
+  </div>
+
+</section>
+
+</main>
+
+<footer>
+  Página educativa autocontenida · Sin dependencias ·
+  Abre este archivo en cualquier navegador.
+</footer>
+
+
+<script>
+
+/* =========================================================
+   NAVEGACIÓN
+========================================================= */
+
+document.querySelectorAll('nav button').forEach(btn => {
+
+  btn.addEventListener('click', () => {
+
+    document.querySelectorAll('nav button')
+      .forEach(b => b.classList.remove('active'));
+
+    btn.classList.add('active');
+
+    document.querySelectorAll('section.tab')
+      .forEach(s => s.classList.remove('visible'));
+
+    document
+      .getElementById('tab-' + btn.dataset.tab)
+      .classList.add('visible');
+
+  });
+
+});
+
+
+/* =========================================================
+   FUNCIONES GENERALES
+========================================================= */
+
+const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
+
+const parentIdx = i =>
+  Math.floor((i - 1) / 2);
+
+const leftIdx = i =>
+  2 * i + 1;
+
+const rightIdx = i =>
+  2 * i + 2;
+
+const levelOf = i =>
+  Math.floor(Math.log2(i + 1));
+
+
+/* =========================================================
+   LABORATORIO
+========================================================= */
+
+const CAP = 15;
+
+let labHeap = [];
+let nextId = 1;
+let labBusy = false;
+
+const labTreeBox =
+  document.getElementById('labTree');
+
+const labLog =
+  document.getElementById('labLog');
+
+const labStrip =
+  document.getElementById('labStrip');
+
+const labInput =
+  document.getElementById('labInput');
+
+const labCount =
+  document.getElementById('labCount');
+
+const btnInsert =
+  document.getElementById('btnInsert');
+
+const btnExtract =
+  document.getElementById('btnExtract');
+
+const btnRandom =
+  document.getElementById('btnRandom');
+
+const btnResetLab =
+  document.getElementById('btnResetLab');
+
+
+function nodeXY(i, w) {
+
+  const lvl = levelOf(i);
+
+  const posInLevel =
+    i - (Math.pow(2, lvl) - 1);
+
+  const slots =
+    Math.pow(2, lvl);
+
+  return {
+    x: ((posInLevel + 0.5) / slots) * w,
+    y: 44 + lvl * 96
+  };
+
+}
+
+
+function drawEdges() {
+
+  let svg =
+    labTreeBox.querySelector('svg.edges');
+
+  if (!svg) {
+
+    svg =
+      document.createElementNS(
+        'http://www.w3.org/2000/svg',
+        'svg'
+      );
+
+    svg.setAttribute('class', 'edges');
+
+    labTreeBox.appendChild(svg);
+  }
+
+  svg.innerHTML = '';
+
+  const w =
+    labTreeBox.clientWidth || 600;
+
+  for (
+    let i = 1;
+    i < labHeap.length;
+    i++
+  ) {
+
+    const p = parentIdx(i);
+
+    const a = nodeXY(p, w);
+    const b = nodeXY(i, w);
+
+    const ln =
+      document.createElementNS(
+        'http://www.w3.org/2000/svg',
+        'line'
+      );
+
+    ln.setAttribute('x1', a.x);
+    ln.setAttribute('y1', a.y);
+    ln.setAttribute('x2', b.x);
+    ln.setAttribute('y2', b.y);
+
+    ln.setAttribute('stroke', '#334155');
+    ln.setAttribute('stroke-width', '3');
+
+    svg.appendChild(ln);
+  }
+
+}
+
+
+function placeAll() {
+
+  const w =
+    labTreeBox.clientWidth || 600;
+
+  labHeap.forEach((n, i) => {
+
+    const c = nodeXY(i, w);
+
+    n.el.style.left = c.x + 'px';
+    n.el.style.top = c.y + 'px';
+
+  });
+
+  drawEdges();
+}
+
+
+function createNodeEl(node) {
+
+  const el =
+    document.createElement('div');
+
+  el.className = 'hnode';
+
+  el.textContent = node.value;
+
+  node.el = el;
+
+  labTreeBox.appendChild(el);
+}
+
+
+function updateStrip() {
+
+  labStrip.innerHTML =
+    labHeap.length === 0
+      ? '<span class="muted">(vacío)</span>'
+      : labHeap.map((n, idx) => `
+          <div class="cell">
+            <span class="val">${n.value}</span>
+            <span class="idx">${idx}</span>
+          </div>
+        `).join('');
+
+  labCount.textContent =
+    `${labHeap.length} / ${CAP} nodos`;
+}
+
+
+function narrate(text, cls) {
+
+  const p =
+    document.createElement('p');
+
+  if (cls) {
+    p.className = cls;
+  }
+
+  p.textContent = text;
+
+  labLog.appendChild(p);
+
+  labLog.scrollTop =
+    labLog.scrollHeight;
+
+  while (
+    labLog.children.length > 30
+  ) {
+    labLog.removeChild(
+      labLog.firstChild
+    );
+  }
+
+}
+
+
+function setHL(node, cls) {
+
+  if (node && node.el) {
+    node.el.classList.add(cls);
+  }
+
+}
+
+
+function clearHLs() {
+
+  labHeap.forEach(n => {
+
+    if (n.el) {
+      n.el.classList.remove(
+        'cur',
+        'par',
+        'ok',
+        'removing'
+      );
+    }
+
+  });
+
+}
+
+
+function setControls(disabled) {
+
+  [
+    btnInsert,
+    btnExtract,
+    btnRandom,
+    btnResetLab
+  ].forEach(b => {
+    b.disabled = disabled;
+  });
+
+}
+
+
+/* =========================================================
+   INSERTAR — SIFT UP
+========================================================= */
+
+async function siftUp(startIdx) {
+
+  let i = startIdx;
+
+  while (i > 0) {
+
+    const p = parentIdx(i);
+
+    const child = labHeap[i];
+    const par = labHeap[p];
+
+    setHL(child, 'cur');
+    setHL(par, 'par');
+
+    narrate(
+      `Comparando: ¿${child.value} > ${par.value} (su padre)?`,
+      'cmp'
+    );
+
+    await sleep(900);
+
+    if (child.value > par.value) {
+
+      narrate(
+        `${child.value} es MAYOR que ${par.value}: intercambio.`,
+        'swp'
+      );
+
+      labHeap[i] = par;
+      labHeap[p] = child;
+
+      placeAll();
+
+      clearHLs();
+
+      await sleep(600);
+
+      i = p;
+
+    } else {
+
+      narrate(
+        `${child.value} no supera a ${par.value}: se detiene.`,
+        'inf'
+      );
+
+      break;
+    }
+
+  }
+
+  clearHLs();
+
+  if (i === 0 && labHeap.length > 0) {
+
+    setHL(labHeap[0], 'ok');
+
+    narrate(
+      `${labHeap[0].value} llegó a la RAÍZ: es el máximo.`,
+      'done'
+    );
+
+    await sleep(700);
+
+    clearHLs();
+
+  } else if (labHeap[i]) {
+
+    setHL(labHeap[i], 'ok');
+
+    await sleep(500);
+
+    clearHLs();
+  }
+
+}
+
+
+/* =========================================================
+   INSERTAR
+========================================================= */
+
+async function insertValue(v) {
+
+  if (labBusy) return;
+
+  const num = Number(v);
+
+  if (
+    !Number.isInteger(num) ||
+    num < -999 ||
+    num > 999
+  ) {
+
+    narrate(
+      'Ingresa un número entero entre -999 y 999.',
+      'swp'
+    );
+
+    return;
+  }
+
+  if (labHeap.length >= CAP) {
+
+    narrate(
+      `Límite de ${CAP} nodos alcanzado.`,
+      'swp'
+    );
+
+    return;
+  }
+
+  labBusy = true;
+
+  setControls(true);
+
+  const node = {
+    id: nextId++,
+    value: num,
+    el: null
+  };
+
+  labHeap.push(node);
+
+  const i =
+    labHeap.length - 1;
+
+  createNodeEl(node);
+
+  placeAll();
+
+  updateStrip();
+
+  narrate(
+    `Insertamos ${num} como hoja en el índice ${i}.`,
+    'inf'
+  );
+
+  await sleep(700);
+
+  await siftUp(i);
+
+  updateStrip();
+
+  narrate(
+    'El árbol vuelve a ser un Max-Heap válido.',
+    'done'
+  );
+
+  labBusy = false;
+
+  setControls(false);
+
+  labInput.focus();
+}
+
+
+/* =========================================================
+   EXTRAER MÁXIMO — SIFT DOWN
+========================================================= */
+
+async function extractMax() {
+
+  if (labBusy) return;
+
+  if (labHeap.length === 0) {
+
+    narrate(
+      'El heap está vacío. No hay máximo para extraer.',
+      'swp'
+    );
+
+    return;
+  }
+
+  labBusy = true;
+
+  setControls(true);
+
+  const maxNode =
+    labHeap[0];
+
+  setHL(maxNode, 'removing');
+
+  narrate(
+    `El máximo actual es ${maxNode.value}, ubicado en la raíz.`,
+    'done'
+  );
+
+  await sleep(800);
+
+  if (labHeap.length === 1) {
+
+    labHeap.pop();
+
+    maxNode.el.remove();
+
+    updateStrip();
+
+    narrate(
+      `Se extrajo ${maxNode.value}. El heap quedó vacío.`,
+      'done'
+    );
+
+    labBusy = false;
+    setControls(false);
+
+    return;
+  }
+
+  const last =
+    labHeap.pop();
+
+  narrate(
+    `Se elimina ${maxNode.value}. El último elemento (${last.value}) ocupa temporalmente la raíz.`,
+    'inf'
+  );
+
+  maxNode.el.remove();
+
+  labHeap[0] = last;
+
+  placeAll();
+  updateStrip();
+
+  await sleep(700);
+
+  let i = 0;
+
+  while (true) {
+
+    const left = leftIdx(i);
+    const right = rightIdx(i);
+
+    let largest = i;
+
+    if (
+      left < labHeap.length &&
+      labHeap[left].value >
+      labHeap[largest].value
+    ) {
+      largest = left;
+    }
+
+    if (
+      right < labHeap.length &&
+      labHeap[right].value >
+      labHeap[largest].value
+    ) {
+      largest = right;
+    }
+
+    if (largest === i) {
+
+      narrate(
+        `${labHeap[i].value} ya es mayor o igual que sus hijos.`,
+        'inf'
+      );
+
+      break;
+    }
+
+    setHL(labHeap[i], 'cur');
+    setHL(labHeap[largest], 'par');
+
+    narrate(
+      `Comparando ${labHeap[i].value} con su hijo mayor ${labHeap[largest].value}.`,
+      'cmp'
+    );
+
+    await sleep(900);
+
+    narrate(
+      `${labHeap[largest].value} es mayor: intercambio y el elemento se hunde.`,
+      'swp'
+    );
+
+    [
+      labHeap[i],
+      labHeap[largest]
+    ] = [
+      labHeap[largest],
+      labHeap[i]
+    ];
+
+    placeAll();
+
+    clearHLs();
+
+    await sleep(600);
+
+    i = largest;
+  }
+
+  clearHLs();
+
+  setHL(labHeap[i], 'ok');
+
+  narrate(
+    `Extracción terminada. ${labHeap[0].value} vuelve a ser el máximo.`,
+    'done'
+  );
+
+  await sleep(700);
+
+  clearHLs();
+
+  updateStrip();
+
+  labBusy = false;
+
+  setControls(false);
+
+  labInput.focus();
+}
+
+
+/* =========================================================
+   REINICIAR
+========================================================= */
+
+function resetLab() {
+
+  if (labBusy) return;
+
+  labHeap = [];
+
+  labTreeBox.innerHTML = '';
+
+  labLog.innerHTML = '';
+
+  updateStrip();
+
+  narrate(
+    'Laboratorio reiniciado. Inserta un número para comenzar.',
+    'inf'
+  );
+}
+
+
+btnInsert.addEventListener(
+  'click',
+  () => {
+
+    insertValue(labInput.value);
+
+    labInput.value = '';
+
+  }
+);
+
+
+labInput.addEventListener(
+  'keydown',
+  e => {
+
+    if (e.key === 'Enter') {
+
+      insertValue(labInput.value);
+
+      labInput.value = '';
+
+    }
+
+  }
+);
+
+
+btnExtract.addEventListener(
+  'click',
+  extractMax
+);
+
+
+btnRandom.addEventListener(
+  'click',
+  () => {
+
+    const v =
+      Math.floor(Math.random() * 99) + 1;
+
+    insertValue(v);
+  }
+);
+
+
+btnResetLab.addEventListener(
+  'click',
+  resetLab
+);
+
+
+updateStrip();
+
+
+/* =========================================================
+   MINI-JUEGO
+========================================================= */
+
+const ROUNDS = [
+  {nodes:3},
+  {nodes:7},
+  {nodes:15}
+];
+
+const SVGNS =
+  'http://www.w3.org/2000/svg';
+
+let gScore = 0;
+let gLives = 3;
+let gRound = 0;
+
+let gVals = [];
+let gViolator = -1;
+
+let gWrongPicks = new Set();
+let gLocked = false;
+
+const gameSvg =
+  document.getElementById('gameTree');
+
+const gameMsg =
+  document.getElementById('gameMsg');
+
+const gameScoreEl =
+  document.getElementById('gameScore');
+
+const gameRoundEl =
+  document.getElementById('gameRound');
+
+const gameLivesEl =
+  document.getElementById('gameLives');
+
+const btnNext =
+  document.getElementById('btnNextRound');
+
+const btnAgain =
+  document.getElementById('btnPlayAgain');
+
+
+function shuffle(a) {
+
+  for (
+    let i = a.length - 1;
+    i > 0;
+    i--
+  ) {
+
+    const j =
+      Math.floor(
+        Math.random() * (i + 1)
+      );
+
+    [
+      a[i],
+      a[j]
+    ] = [
+      a[j],
+      a[i]
+    ];
+  }
+
+  return a;
+}
+
+
+function genRound(n) {
+
+  let vals =
+    shuffle(
+      Array.from(
+        {length:99},
+        (_, k) => k + 1
+      )
+    )
+    .slice(0, n)
+    .sort((a,b) => b-a);
+
+  let violator = -1;
+
+  for (
+    const x of shuffle(
+      Array.from(
+        {length:n - 1},
+        (_, k) => k + 1
+      )
+    )
+  ) {
+
+    const p = parentIdx(x);
+
+    const used =
+      new Set(vals);
+
+    let nv =
+      vals[p] +
+      1 +
+      Math.floor(
+        Math.random() * 8
+      );
+
+    while (
+      nv <= 99 &&
+      used.has(nv)
+    ) {
+      nv++;
+    }
+
+    if (nv <= 99) {
+
+      vals[x] = nv;
+
+      violator = x;
+
+      break;
+    }
+  }
+
+  if (violator === -1) {
+    return genRound(n);
+  }
+
+  return {
+    vals,
+    violator
+  };
+}
+
+
+function gameNodePos(i, n) {
+
+  const lvl = levelOf(i);
+
+  const posInLevel =
+    i -
+    (Math.pow(2, lvl) - 1);
+
+  const slots =
+    Math.pow(2, lvl);
+
+  return {
+    x:
+      ((posInLevel + 0.5) /
+      slots) * 640,
+
+    y:
+      50 +
+      lvl *
+      Math.min(
+        116,
+        300 /
+        Math.max(
+          1,
+          levelOf(n - 1)
+        )
+      )
+  };
+}
+
+
+function renderGame() {
+
+  gameSvg.innerHTML = '';
+
+  const n =
+    gVals.length;
+
+  for (
+    let i = 1;
+    i < n;
+    i++
+  ) {
+
+    const p =
+      parentIdx(i);
+
+    const a =
+      gameNodePos(p,n);
+
+    const b =
+      gameNodePos(i,n);
+
+    const ln =
+      document.createElementNS(
+        SVGNS,
+        'line'
+      );
+
+    ln.setAttribute(
+      'x1',
+      a.x
+    );
+
+    ln.setAttribute(
+      'y1',
+      a.y
+    );
+
+    ln.setAttribute(
+      'x2',
+      b.x
+    );
+
+    ln.setAttribute(
+      'y2',
+      b.y
+    );
+
+    ln.setAttribute(
+      'class',
+      'gedge'
+    );
+
+    gameSvg.appendChild(ln);
+  }
+
+  gVals.forEach((v,i) => {
+
+    const c =
+      gameNodePos(i,n);
+
+    const g =
+      document.createElementNS(
+        SVGNS,
+        'g'
+      );
+
+    g.setAttribute(
+      'class',
+      'gnode'
+    );
+
+    const circ =
+      document.createElementNS(
+        SVGNS,
+        'circle'
+      );
+
+    circ.setAttribute(
+      'cx',
+      c.x
+    );
+
+    circ.setAttribute(
+      'cy',
+      c.y
+    );
+
+    circ.setAttribute(
+      'r',
+      '27'
+    );
+
+    const txt =
+      document.createElementNS(
+        SVGNS,
+        'text'
+      );
+
+    txt.setAttribute(
+      'x',
+      c.x
+    );
+
+    txt.setAttribute(
+      'y',
+      c.y
+    );
+
+    txt.setAttribute(
+      'text-anchor',
+      'middle'
+    );
+
+    txt.setAttribute(
+      'dy',
+      '.35em'
+    );
+
+    txt.textContent = v;
+
+    g.appendChild(circ);
+    g.appendChild(txt);
+
+    g.addEventListener(
+      'click',
+      () => onPick(i,g)
+    );
+
+    gameSvg.appendChild(g);
+
+  });
+}
+
+
+function updateHUD() {
+
+  gameScoreEl.textContent =
+    gScore;
+
+  [
+    ...gameLivesEl.children
+  ].forEach(
+    (pip,i) =>
+      pip.classList.toggle(
+        'lost',
+        i >= gLives
+      )
+  );
+}
+
+
+function revealAll() {
+
+  [
+    ...gameSvg.querySelectorAll(
+      '.gnode'
+    )
+  ].forEach((g,i) => {
+
+    if (i === gViolator) {
+      g.classList.add('found');
+    } else {
+      g.classList.add('dim');
+    }
+
+  });
+}
+
+
+function onPick(i,gEl) {
+
+  if (
+    gLocked ||
+    gEl.classList.contains('wrong')
+  ) {
+    return;
+  }
+
+  if (i === gViolator) {
+
+    gLocked = true;
+
+    const pts =
+      Math.max(
+        40,
+        100 -
+        30 *
+        gWrongPicks.size
+      );
+
+    gScore += pts;
+
+    updateHUD();
+
+    revealAll();
+
+    const v =
+      gVals[i];
+
+    const pv =
+      gVals[parentIdx(i)];
+
+    gameMsg.className =
+      'gmsg good';
+
+    gameMsg.textContent =
+      `¡Correcto! El nodo ${v} supera a su padre ${pv}. ` +
+      `Eso está prohibido en un Max-Heap. ` +
+      `Ganaste ${pts} puntos.`;
+
+    btnNext.classList.remove(
+      'hidden'
+    );
+
+  } else {
+
+    gWrongPicks.add(i);
+
+    gEl.classList.add(
+      'wrong'
+    );
+
+    gLives--;
+
+    updateHUD();
+
+    if (gLives <= 0) {
+
+      gLocked = true;
+
+      revealAll();
+
+      const v =
+        gVals[gViolator];
+
+      const pv =
+        gVals[
+          parentIdx(gViolator)
+        ];
+
+      gameMsg.className =
+        'gmsg bad';
+
+      gameMsg.textContent =
+        `Sin vidas. El intruso era ${v}, ` +
+        `que superaba a su padre ${pv}.`;
+
+      btnNext.classList.add(
+        'hidden'
+      );
+
+      btnAgain.classList.remove(
+        'hidden'
+      );
+
+    } else {
+
+      gameMsg.className =
+        'gmsg bad';
+
+      const pv =
+        gVals[parentIdx(i)];
+
+      gameMsg.textContent =
+        `Ese nodo sí cumple: ` +
+        `${gVals[i]} no supera a su padre ${pv}. ` +
+        `Pierdes una vida.`;
+
+    }
+  }
+}
+
+
+function startRound() {
+
+  const cfg =
+    ROUNDS[gRound];
+
+  const r =
+    genRound(cfg.nodes);
+
+  gVals =
+    r.vals;
+
+  gViolator =
+    r.violator;
+
+  gWrongPicks =
+    new Set();
+
+  gLocked = false;
+
+  gameMsg.className =
+    'gmsg';
+
+  gameMsg.textContent =
+    'Encuentra al intruso. ' +
+    'Compara cada hijo con su padre.';
+
+  gameRoundEl.textContent =
+    `Nivel ${gRound + 1} de ${ROUNDS.length} · ` +
+    `${cfg.nodes} nodos`;
+
+  btnNext.classList.add(
+    'hidden'
+  );
+
+  btnAgain.classList.add(
+    'hidden'
+  );
+
+  renderGame();
+}
+
+
+function showVictory() {
+
+  gameSvg.innerHTML = '';
+
+  gameRoundEl.textContent =
+    'Juego terminado';
+
+  gameMsg.className =
+    'gmsg good';
+
+  gameMsg.textContent =
+    'Completaste los 3 niveles. ' +
+    'Ya dominas la regla del Max-Heap. ' +
+    'Ahora prueba a crear y eliminar elementos en el Laboratorio.';
+
+  btnAgain.classList.remove(
+    'hidden'
+  );
+}
+
+
+btnNext.addEventListener(
+  'click',
+  () => {
+
+    gRound++;
+
+    if (
+      gRound >= ROUNDS.length
+    ) {
+      showVictory();
+    } else {
+      startRound();
+    }
+
+  }
+);
+
+
+btnAgain.addEventListener(
+  'click',
+  () => {
+
+    gScore = 0;
+    gLives = 3;
+    gRound = 0;
+
+    updateHUD();
+
+    startRound();
+
+  }
+);
+
+
+updateHUD();
+
+startRound();
+
+</script>
+
+</body>
+</html>
